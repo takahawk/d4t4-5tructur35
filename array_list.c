@@ -14,6 +14,7 @@ AllocArrayList(int elemSize, int capacity) {
 	al->len = 0;
        	al->data = malloc(elemSize * capacity);
 	memset(al->data, 0, elemSize * capacity);
+	return al;
 }
 
 void
