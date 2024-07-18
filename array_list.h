@@ -13,6 +13,9 @@ AllocArrayList(int elemSize, int capacity);
 void
 ArrayListAdd(ArrayList*, void*);
 
+void*
+ArrayListGet(ArrayList*, int);
+
 // returns count of removed elements
 int
 ArrayListRemove(ArrayList*, void*);

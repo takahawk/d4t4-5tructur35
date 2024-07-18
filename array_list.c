@@ -30,6 +30,15 @@ ArrayListAdd(ArrayList* al, void* elem) {
 
 }
 
+void*
+ArrayListGet(ArrayList* al, int i) {
+	if (i >= al->len)
+		return NULL;
+
+	return (char *) al->data + i * al->elemSize;
+
+}
+
 int
 ArrayListRemove(ArrayList* al, void* elem) {
 	int c = 0;
