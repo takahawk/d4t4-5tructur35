@@ -24,6 +24,9 @@ void
 ArrayListRemoveAt(ArrayList*, int);
 
 void
+ArrayListSwap(ArrayList*, int, int);
+
+void
 FreeArrayList(ArrayList*);
 
 #endif

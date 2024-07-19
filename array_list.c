@@ -6,6 +6,15 @@
 inline static void
 _Clear(ArrayList*);
 
+static void
+memswp(void *a, void *b, int n) {
+	for (int i = 0; i < n; i++) {
+		char t = *((char *) a + i);
+		*((char *) b + i) = *((char *) a + i);
+		*((char *) a + i) = t;
+	}
+}
+
 ArrayList*
 AllocArrayList(int elemSize, int capacity) {
 	ArrayList *al = malloc(sizeof(ArrayList));
@@ -68,6 +77,13 @@ ArrayListRemoveAt(ArrayList* al, int i) {
 	memset((char *) al->data + al->len * al->elemSize, 
 	       0,
 	       al->elemSize);
+}
+
+void
+ArrayListSwap(ArrayList* al, int i, int j) {
+	memswp((char *) al->data + (i * al->elemSize),
+	       (char *) al->data + (j * al->elemSize),
+       	       al->elemSize);	       
 }
 
 void
