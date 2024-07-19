@@ -11,20 +11,20 @@ ArrayList*
 AllocArrayList(int elemSize, int capacity);
 
 void
-ArrayListAdd(ArrayList*, void*);
+AL_Add(ArrayList*, void*);
 
 void*
-ArrayListGet(ArrayList*, int);
+AL_Get(ArrayList*, int);
 
 // returns count of removed elements
 int
-ArrayListRemove(ArrayList*, void*);
+AL_Remove(ArrayList*, void*);
 
 void
-ArrayListRemoveAt(ArrayList*, int);
+AL_RemoveAt(ArrayList*, int);
 
 void
-ArrayListSwap(ArrayList*, int, int);
+AL_Swap(ArrayList*, int, int);
 
 void
 FreeArrayList(ArrayList*);

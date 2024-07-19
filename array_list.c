@@ -27,7 +27,7 @@ AllocArrayList(int elemSize, int capacity) {
 }
 
 void
-ArrayListAdd(ArrayList* al, void* elem) {
+AL_Add(ArrayList* al, void* elem) {
 	if (al->len == al->capacity) {
 		// mb make it adjustable?
 		al->capacity *= 2;
@@ -41,7 +41,7 @@ ArrayListAdd(ArrayList* al, void* elem) {
 }
 
 void*
-ArrayListGet(ArrayList* al, int i) {
+AL_Get(ArrayList* al, int i) {
 	if (i >= al->len)
 		return NULL;
 
@@ -50,7 +50,7 @@ ArrayListGet(ArrayList* al, int i) {
 }
 
 int
-ArrayListRemove(ArrayList* al, void* elem) {
+AL_Remove(ArrayList* al, void* elem) {
 	int c = 0;
 	for (int i = 0; i < al->len; i ++) {
 		if (!memcmp((char *) al->data + i * al->elemSize, 
@@ -58,7 +58,7 @@ ArrayListRemove(ArrayList* al, void* elem) {
 			    al->elemSize)) {
 			// room for optimization? first, find all the elements
 			// then remove them all together in one take
-			ArrayListRemoveAt(al, i);
+			AL_RemoveAt(al, i);
 			c++;
 		}
 	}
@@ -67,7 +67,7 @@ ArrayListRemove(ArrayList* al, void* elem) {
 }
 
 void
-ArrayListRemoveAt(ArrayList* al, int i) {
+AL_RemoveAt(ArrayList* al, int i) {
 	if (i < --al->len) {
 		// move everything down if not the last element
 		char *ptr = (char *) al->data + i * al->elemSize;
@@ -80,7 +80,7 @@ ArrayListRemoveAt(ArrayList* al, int i) {
 }
 
 void
-ArrayListSwap(ArrayList* al, int i, int j) {
+AL_Swap(ArrayList* al, int i, int j) {
 	memswp((char *) al->data + (i * al->elemSize),
 	       (char *) al->data + (j * al->elemSize),
        	       al->elemSize);	       
