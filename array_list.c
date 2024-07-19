@@ -10,8 +10,8 @@ static void
 memswp(void *a, void *b, int n) {
 	for (int i = 0; i < n; i++) {
 		char t = *((char *) a + i);
-		*((char *) b + i) = *((char *) a + i);
-		*((char *) a + i) = t;
+		*((char *) a + i) = *((char *) b + i);
+		*((char *) b + i) = t;
 	}
 }
 
