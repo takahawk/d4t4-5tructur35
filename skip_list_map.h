@@ -3,15 +3,11 @@
 
 #include "buffer.h"
 
-typedef struct {
+typedef struct _SLM_Node {
+	struct _SLM_Node *next;
+	struct _SLM_Node *lower;
 	Buffer key;
 	Buffer value;
-} _SLM_KeyValue;
-
-typedef struct _SLM_Node {
-	_SLM_Node *next;
-	_SLM_Node *lower;
-	_SLM_KeyValue *keyValue;
 } _SLM_Node;
 
 typedef struct {
@@ -22,7 +18,7 @@ SkipListMap
 SLM_Create();
 
 void
-SLM_Add(SkipListMap *slm, Buffer key, Buffer value);
+SLM_Set(SkipListMap *slm, Buffer key, Buffer value);
 
 Buffer
 SLM_Get(SkipListMap *slm, Buffer key);
