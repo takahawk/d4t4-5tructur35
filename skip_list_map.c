@@ -22,7 +22,7 @@ _TossCoin() {
 
 // alloc node. with levels. 
 // returned value is a pointer to lowest (most common) level
-static inline _SLM_Node*
+static _SLM_Node*
 _AllocNode(Buffer key, Buffer value) {
 	_SLM_Node *node = malloc(sizeof(_SLM_Node));
 	node->next = NULL;
@@ -43,6 +43,73 @@ _AllocNode(Buffer key, Buffer value) {
 
 	return node;
 }
+
+static _SLM_Node*
+_ExpandUpper(_SLM_Node *node) {
+	_SLM_Node *newNode = malloc(sizeof(_SLM_Node));
+	newNode->next = NULL;
+	newNode->prev = NULL;
+	newNode->upper = NULL;
+	newNode->lower = node;
+	node->upper = newNode;
+	return newNode;
+}
+
+static _SLM_Node*
+_GetLowest(_SLM_Node *node) {
+	while (node->lower)
+		node = node->lower;
+
+	return node;
+}
+
+static _SLM_Node*
+_GetUpperLeft(_SLM_Node *node) {
+	while (node && !node->upper) {
+		node = node->prev;
+	}
+
+	return node;
+}
+
+static _SLM_Node*
+_GetUpperRight(_SLM_Node *node) {
+	while (node && !node->upper) {
+		node = node->next;
+	}
+
+	return node;
+}
+
+// assumes lowest nodes are given
+// fixing left node we connect it to nodes on the right
+static void
+_ConnectLeft(_SLM_Node* left, _SLM_Node* right, int expandLevel) {
+	do {
+		left->next = right;
+		right->prev = left;
+		right = _GetUpperRight(right);
+		if (!left->upper && (expandLevel && right)) {
+			left = _ExpandUpper(left);
+		} else {
+			left = left->upper;
+		}
+	} while(left && right);
+}
+
+// assumes lowest nodes are given
+// fixing right node we connect it to nodes on the left
+// we do not need expand level for this one
+static void
+_ConnectRight(_SLM_Node* left, _SLM_Node* right) {
+	do {
+		left->next = right;
+		right->prev = left;
+		left = _GetUpperLeft(left);
+		right = right->upper;
+	} while(left && right);
+}
+
 
 static _SLM_Node*
 _GetNode(SkipListMap *slm, Buffer key) {
@@ -97,7 +164,7 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 		memcpy(value.data, newValue.data, value.len);
 	} 
 
-	_SLM_Node node = slm->head;
+	_SLM_Node* node = slm->head;
 	// TODO: implement
 }
 
