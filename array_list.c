@@ -40,6 +40,15 @@ AL_Add(ArrayList* al, void* elem) {
 
 }
 
+void
+AL_Set(ArrayList* al, int i, void* data) {
+	if (al->len <= i)
+		// TODO: error handling?
+		return;
+	memcpy((char *) al->data + (al->elemSize * i), data, al->elemSize);
+}
+
+
 void*
 AL_Get(ArrayList* al, int i) {
 	if (i >= al->len)

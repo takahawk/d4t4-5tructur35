@@ -13,6 +13,9 @@ AllocArrayList(int elemSize, int capacity);
 void
 AL_Add(ArrayList*, void*);
 
+void
+AL_Set(ArrayList*, int, void*);
+
 void*
 AL_Get(ArrayList*, int);
 
