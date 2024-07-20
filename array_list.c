@@ -15,14 +15,14 @@ memswp(void *a, void *b, int n) {
 	}
 }
 
-ArrayList*
+ArrayList
 AllocArrayList(int elemSize, int capacity) {
-	ArrayList *al = malloc(sizeof(ArrayList));
-	al->elemSize = elemSize;
-	al->capacity = capacity;
-	al->len = 0;
-       	al->data = malloc(elemSize * capacity);
-	memset(al->data, 0, elemSize * capacity);
+	ArrayList al;
+	al.elemSize = elemSize;
+	al.capacity = capacity;
+	al.len = 0;
+       	al.data = malloc(elemSize * capacity);
+	memset(al.data, 0, elemSize * capacity);
 	return al;
 }
 
@@ -89,7 +89,6 @@ AL_Swap(ArrayList* al, int i, int j) {
 void
 FreeArrayList(ArrayList* al) {
 	free(al->data);
-	free(al);
 }
 
 

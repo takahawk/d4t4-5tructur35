@@ -7,7 +7,7 @@ typedef struct {
 	void *data;
 } ArrayList;
 
-ArrayList*
+ArrayList
 AllocArrayList(int elemSize, int capacity);
 
 void
