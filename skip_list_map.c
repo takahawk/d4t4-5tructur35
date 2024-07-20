@@ -15,11 +15,31 @@ _Cmp(Buffer a, Buffer b) {
 	return c;
 }
 
+static inline int
+_TossCoin() {
+	return rand() > (RAND_MAX / 2.);
+}
+
+// alloc node. with levels. 
+// returned value is a pointer to lowest (most common) level
 static inline _SLM_Node*
 _AllocNode(Buffer key, Buffer value) {
 	_SLM_Node *node = malloc(sizeof(_SLM_Node));
+	node->next = NULL;
+	node->prev = NULL;
 	node->key = key;
 	node->value = value;
+	node->upper = NULL;
+
+	while (_TossCoin()) {
+		_SLM_Node *lowerNode = malloc(sizeof(_SLM_Node));
+		lowerNode->next = NULL;
+		lowerNode->prev = NULL;
+		lowerNode->upper = node;
+		node->lower = lowerNode;
+		node = lowerNode;
+	}
+	node->lower = NULL;
 
 	return node;
 }
@@ -60,6 +80,24 @@ SLM_Create() {
 
 void
 SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
+	if (slm->head == NULL) {
+
+	}
+
+	int c = _Cmp(key, slm->head->key);
+
+	if (c < 0) {
+		// add node with levels before
+	} else if (c == 0) {
+		Buffer newValue = value;
+		Buffer value = slm->head->value;
+
+		value.len = newValue.len;
+		value.data = realloc(value.data, value.len);
+		memcpy(value.data, newValue.data, value.len);
+	} 
+
+	_SLM_Node node = slm->head;
 	// TODO: implement
 }
 

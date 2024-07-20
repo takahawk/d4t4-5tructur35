@@ -5,7 +5,9 @@
 
 typedef struct _SLM_Node {
 	struct _SLM_Node *next;
+	struct _SLM_Node *prev;
 	struct _SLM_Node *lower;
+	struct _SLM_Node *upper;
 	Buffer key;
 	Buffer value;
 } _SLM_Node;
