@@ -50,9 +50,8 @@ _AllocNode(Buffer key, Buffer value) {
 	_SLM_Node *node = malloc(sizeof(_SLM_Node));
 	node->nexts = AllocArrayList(sizeof(_SLM_Node*), AL_START_CAPACITY);
 	node->prevs = AllocArrayList(sizeof(_SLM_Node*), AL_START_CAPACITY);
-	// TODO: error! should copy
-	node->key = key;
-	node->value = value;
+	node->key = B_Copy(key);
+	node->value = B_Copy(value);
 
 	while (_TossCoin()) {
 		_Expand(node);
@@ -61,8 +60,16 @@ _AllocNode(Buffer key, Buffer value) {
 	return node;
 }
 
+static void
+_FreeNode(_SLM_Node *node) {
+	FreeArrayList(&node->nexts);
+	FreeArrayList(&node->prevs);
+	FreeBuffer(&node->key);
+	FreeBuffer(&node->value);
+}
 
-void
+
+static void
 _SetNodeValue(_SLM_Node *node, Buffer newValue) {
 	Buffer value = node->value;
 
@@ -158,5 +165,14 @@ void
 SLM_Free(SkipListMap *slm) {
 	if (slm->head == NULL)
 		return;
-	// TODO: implement
+
+	_SLM_Node *node = slm->head;
+
+	while (node) {
+		next = _AL_GetNode(node->nexts, 0);
+		_FreeNode(node);
+		node = next;
+	}
+	
+	slm->head = NULL;
 }

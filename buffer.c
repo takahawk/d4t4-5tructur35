@@ -22,6 +22,8 @@ B_Copy(Buffer buf) {
 }
 
 void
-FreeBuffer(Buffer buf) {
-	free(buf.data);
+FreeBuffer(Buffer *buf) {
+	free(buf->data);
+	buf->data = NULL;
+	buf->len = 0;
 }

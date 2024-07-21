@@ -20,5 +20,5 @@ Buffer
 B_Copy(Buffer);
 
 void
-FreeBuffer(Buffer);
+FreeBuffer(Buffer*);
 #endif
