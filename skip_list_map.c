@@ -4,6 +4,8 @@
 #include <string.h>
 #include <sys/param.h>
 
+#define AL_START_CAPACITY 2 
+
 static inline int
 _Cmp(Buffer a, Buffer b) {
 	// TODO: move it to buffer probably?
@@ -20,123 +22,45 @@ _TossCoin() {
 	return rand() > (RAND_MAX / 2.);
 }
 
+static inline void
+_AL_AddNode(ArrayList *al, _SLM_Node *node) {
+	AL_Add(al, &node);
+}
+
+static inline void
+_AL_SetNode(ArrayList *al, int i, _SLM_Node *node) {
+	AL_Set(al, i, &node);
+}
+
+static inline _SLM_Node*
+_AL_GetNode(ArrayList *al, int i) {
+	return *((_SLM_Node**) AL_Get(al, i));
+}
+
+static inline void
+_Expand(_SLM_Node *node) {
+	_AL_AddNode(&node->nexts, NULL);
+	_AL_AddNode(&node->prevs, NULL);
+}
+
 // alloc node. with levels. 
 // returned value is a pointer to lowest (most common) level
 static _SLM_Node*
 _AllocNode(Buffer key, Buffer value) {
 	_SLM_Node *node = malloc(sizeof(_SLM_Node));
-	node->next = NULL;
-	node->prev = NULL;
+	node->nexts = AllocArrayList(sizeof(_SLM_Node*), AL_START_CAPACITY);
+	node->prevs = AllocArrayList(sizeof(_SLM_Node*), AL_START_CAPACITY);
+	// TODO: error! should copy
 	node->key = key;
 	node->value = value;
-	node->upper = NULL;
 
 	while (_TossCoin()) {
-		_SLM_Node *lowerNode = malloc(sizeof(_SLM_Node));
-		lowerNode->next = NULL;
-		lowerNode->prev = NULL;
-		lowerNode->upper = node;
-		node->lower = lowerNode;
-		node = lowerNode;
-	}
-	node->lower = NULL;
-
-	return node;
-}
-
-static _SLM_Node*
-_ExpandUpper(_SLM_Node *node) {
-	_SLM_Node *newNode = malloc(sizeof(_SLM_Node));
-	newNode->next = NULL;
-	newNode->prev = NULL;
-	newNode->upper = NULL;
-	newNode->lower = node;
-	node->upper = newNode;
-	return newNode;
-}
-
-static _SLM_Node*
-_GetLowest(_SLM_Node *node) {
-	while (node->lower)
-		node = node->lower;
-
-	return node;
-}
-
-static _SLM_Node*
-_GetUpperLeft(_SLM_Node *node) {
-	while (node && !node->upper) {
-		node = node->prev;
+		_Expand(node);
 	}
 
 	return node;
 }
 
-static _SLM_Node*
-_GetUpperRight(_SLM_Node *node) {
-	while (node && !node->upper) {
-		node = node->next;
-	}
-
-	return node;
-}
-
-// assumes lowest nodes are given
-// fixing left node we connect it to nodes on the right
-static void
-_ConnectLeft(_SLM_Node* left, _SLM_Node* right, int expandLevel) {
-	do {
-		left->next = right;
-		right->prev = left;
-		right = _GetUpperRight(right);
-		if (!left->upper && (expandLevel && right)) {
-			left = _ExpandUpper(left);
-		} else {
-			left = left->upper;
-		}
-	} while(left);
-}
-
-// assumes lowest nodes are given
-// fixing right node we connect it to nodes on the left
-// we do not need expand level for this one
-static void
-_ConnectRight(_SLM_Node* left, _SLM_Node* right) {
-	do {
-		left->next = right;
-		right->prev = left;
-		left = _GetUpperLeft(left);
-		right = right->upper;
-	} while(right);
-}
-
-
-static _SLM_Node*
-_GetNode(SkipListMap *slm, Buffer key) {
-	_SLM_Node* node = slm->head;
-outer:
-	while (node) {
-		int c = _Cmp(key, node->key);
-		if (c < 0) {
-			// lesser than any node - our node not in the list
-			return NULL;
-		} else if (c == 0) {
-			return node;
-		} else {
-			while (node->next) {
-				c = _Cmp(key, node->key);
-				if (c >= 0) {
-					node = node->next;
-					goto outer;
-				} else {
-					node = node->lower;
-				}
-			}
-		}
-	}
-
-	return NULL;
-}
 
 void
 _SetNodeValue(_SLM_Node *node, Buffer newValue) {
@@ -145,6 +69,47 @@ _SetNodeValue(_SLM_Node *node, Buffer newValue) {
 	value.len = newValue.len;
 	value.data = realloc(value.data, value.len);
 	memcpy(value.data, newValue.data, value.len);
+}
+
+static _SLM_Node*
+_GetRightWithLevel(_SLM_Node *node, int level) {
+	while (node && node->nexts.len <= level)
+		node = _AL_GetNode(&node->nexts, level);
+	return node;
+}
+
+static _SLM_Node*
+_GetLeftWithLevel(_SLM_Node *node, int level) {
+	while (node && node->prevs.len <= level)
+		node = _AL_GetNode(&node->prevs, level);
+
+	return node;
+}
+
+static void
+_ConnectLeft(_SLM_Node *left, _SLM_Node *right, int expandLeft) {
+	int level = 0;
+	do {
+		_AL_SetNode(&left->nexts, level, right);
+		_AL_SetNode(&right->prevs, level, left);
+
+		level++;
+		right = _GetRightWithLevel(right, level);
+		if (left->nexts.len == level && (right && expandLeft))
+			_Expand(left);
+	} while (left->nexts.len < level);
+}
+
+static void
+_ConnectRight(_SLM_Node *left, _SLM_Node *right) {
+	int level = 0;
+	do {
+		_AL_SetNode(&left->nexts, level, right);
+		_AL_SetNode(&right->prevs, level, left);
+
+		level++;
+		left = _GetLeftWithLevel(left, level);
+	} while (right->nexts.len < level);
 }
 
 SkipListMap
@@ -165,7 +130,7 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 
 	if (c < 0) {
 		_SLM_Node *node = _AllocNode(key, value);
-		_ConnectLeft(node, _GetLowest(slm->head), 1);
+		_ConnectLeft(node, slm->head, 1);
 		slm->head = node;
 		return;
 	} else if (c == 0) {
@@ -174,36 +139,14 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 	}	
 
 	_SLM_Node *node = slm->head;
-	while (node->next) {
-		int c = _Cmp(key, node->next->key);
-		if (c < 0) {
-			if (node->lower) {
-				node = node->lower;
-				continue;
-			}
-			_SLM_Node *newNode = _AllocNode(key, value);
-			_SLM_Node *next = node->next;
-			_ConnectRight(node, newNode);
-			_ConnectLeft(newNode, next, 0);
-			return;
-		} else if (c == 0) {
-			_SetNodeValue(node->next, value);
-			return;
-		}
-
-		node = node->next;
-	}
-
-	while(node->lower)
-		node = node->lower;
-	_SLM_Node *newNode = _AllocNode(key, value);
-	_ConnectRight(node, newNode);
+	int level = node->nexts.len - 1;
+	// TODO: rewrite with using new array list layout
 
 }
 
 Buffer
 SLM_Get(SkipListMap *slm, Buffer key) {
-	return _GetNode(slm, key)->value;
+	// TODO: impelement
 }
 
 void
@@ -213,5 +156,7 @@ SLM_Delete(SkipListMap *slm, Buffer key) {
 
 void
 SLM_Free(SkipListMap *slm) {
+	if (slm->head == NULL)
+		return;
 	// TODO: implement
 }

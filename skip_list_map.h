@@ -1,13 +1,12 @@
 #ifndef SKIP_LIST_MAP_H_
 #define SKIP_LIST_MAP_H_
 
+#include "array_list.h"
 #include "buffer.h"
 
 typedef struct _SLM_Node {
-	struct _SLM_Node *next;
-	struct _SLM_Node *prev;
-	struct _SLM_Node *lower;
-	struct _SLM_Node *upper;
+	ArrayList nexts;
+	ArrayList prevs;
 	Buffer key;
 	Buffer value;
 } _SLM_Node;
