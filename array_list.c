@@ -98,6 +98,9 @@ AL_Swap(ArrayList* al, int i, int j) {
 void
 FreeArrayList(ArrayList* al) {
 	free(al->data);
+	al->data = NULL;
+	al->capacity = 0;
+	al->len = 0;
 }
 
 
