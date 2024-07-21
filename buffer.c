@@ -4,7 +4,7 @@
 #include <string.h>
 
 Buffer
-ToBuffer(void* data, size_t len) {
+AsBuffer(void* data, size_t len) {
 	return (Buffer) {
 		.data = data,
 		.len = len
@@ -12,13 +12,14 @@ ToBuffer(void* data, size_t len) {
 }
 
 Buffer
-CopyBuffer(void* data, size_t len) {
-	Buffer buf;
-	buf.len = len;
-	memcpy(buf.data, data, len);
-	return buf;
-}
+B_Copy(Buffer buf) {
+	Buffer newBuf;
+	newBuf.len = buf.len;
+	newBuf.data = malloc(newBuf.len);
+	memcpy(newBuf.data, buf.data, buf.len);
 
+	return newBuf;
+}
 
 void
 FreeBuffer(Buffer buf) {

@@ -9,14 +9,15 @@ typedef struct {
 } Buffer;
 
 // not copying the data, just wrap it inside buffer struct
-// to have length attached and possibly manage memory by it
-// in the future
+// to have length attached 
+// FreeBuffer shouldn't be called for this kind of buffers
 Buffer
-ToBuffer(void*, size_t);
+AsBuffer(void*, size_t);
 
-// copy data to newly create buffer structure
+// copies buffer
+// memory can (and should be) freed using FreeBuffer 
 Buffer
-CopyBuffer(void*, size_t);
+B_Copy(Buffer);
 
 void
 FreeBuffer(Buffer);
