@@ -169,7 +169,7 @@ SLM_Free(SkipListMap *slm) {
 	_SLM_Node *node = slm->head;
 
 	while (node) {
-		next = _AL_GetNode(node->nexts, 0);
+		_SLM_Node *next = _AL_GetNode(&node->nexts, 0);
 		_FreeNode(node);
 		node = next;
 	}
