@@ -68,6 +68,33 @@ _FreeNode(_SLM_Node *node) {
 	FreeBuffer(&node->value);
 }
 
+static _SLM_Node*
+_GetNode(SkipListMap slm, Buffer key) {
+	_SLM_Node *node = slm.head;
+	int c = _Cmp(key, node->key);
+	if (c < 0)
+		return NULL;
+	if (c == 0)
+		return node;
+	int level = node->nexts.len;
+outer:
+	while (node && level >= 0) {
+		_SLM_Node *next = _AL_GetNode(&node->nexts, level);
+		c = _Cmp(key, next->key);
+
+		if (c > 0) {
+			node = next;
+			goto outer;
+		}
+
+		if (c == 0)
+			return next;
+	
+		level--;
+	}
+
+	return NULL;
+}
 
 static void
 _SetNodeValue(_SLM_Node *node, Buffer newValue) {
@@ -181,36 +208,64 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 }
 
 Buffer*
-SLM_Get(SkipListMap *slm, Buffer key) {
-	_SLM_Node *node = slm->head;
-	int c = _Cmp(key, node->key);
-	if (c < 0)
-		return NULL;
-	if (c == 0)
+SLM_Get(SkipListMap slm, Buffer key) {
+	_SLM_Node *node = _GetNode(slm, key);
+	if (node)
 		return &node->value;
-	int level = node->nexts.len;
-outer:
-	while (node && level >= 0) {
-		_SLM_Node *next = _AL_GetNode(&node->nexts, level);
-		c = _Cmp(key, next->key);
-
-		if (c > 0) {
-			node = next;
-			goto outer;
-		}
-
-		if (c == 0)
-			return &next->value;
-	
-		level--;
-	}
 
 	return NULL;
 }
 
 void
 SLM_Delete(SkipListMap *slm, Buffer key) {
-	// TODO: implement
+	_SLM_Node *node = _GetNode(*slm, key);
+	if (!node)
+		return;
+	if (node == slm->head) {
+		// case 1: deleted node is first (head)
+		slm->head = _AL_GetNode(&node->nexts, 0);
+
+		if (slm->head != NULL) {
+			_SLM_Node *head = slm->head;
+			// TODO: probably memset whole arraylist data
+			//       to NULL would be faster?
+			for (int i = 0; i < head->prevs.len; i++) {
+				_AL_SetNode(&head->prevs, i, NULL);
+			}	
+			_SLM_Node *newNext = _AL_GetNode(&head->nexts, 0);
+			if (newNext) {
+				// promote new head to highest level
+				_ConnectLeft(head, newNext, 1);
+			} else {
+				// the new head is the only node in a list now
+				for (int i = 0; i < head->nexts.len; i++) {
+					_AL_SetNode(&head->nexts, i, NULL);
+				}
+
+			}
+		}
+		goto cleanup;
+	}
+
+	if (_AL_GetNode(&node->nexts, 0) == NULL) {
+		// case 2: deleted node is last
+		for (int i = 0; i < node->prevs.len; i++) {
+			_SLM_Node *prev = _AL_GetNode(&node->prevs, i);
+			_AL_SetNode(&prev->nexts, i, NULL);
+		}
+		goto cleanup;
+	}
+
+	// case 3: node is somewhere in-between first and last
+	for (int i = 0; i < node->prevs.len; i++) {
+		_SLM_Node *prev = _AL_GetNode(&node->prevs, i);
+		_SLM_Node *next = _AL_GetNode(&node->nexts, i);
+		_AL_SetNode(&prev->nexts, i, next);
+		_AL_SetNode(&next->prevs, i, prev);
+	}
+
+cleanup:
+	_FreeNode(node);		
 }
 
 void
