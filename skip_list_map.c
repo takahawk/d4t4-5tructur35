@@ -147,8 +147,36 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 
 	_SLM_Node *node = slm->head;
 	int level = node->nexts.len - 1;
-	// TODO: rewrite with using new array list layout
 
+	do {
+		_SLM_Node next = _AL_GetNode(node->nexts, level);
+		if (!next) {
+			level--;
+			continue;
+		}
+		c = _Cmp(key, next->key);
+		if (c < 0) {
+			if (level == 0) {
+				_SLM_Node *newNode = _AllocNode(key, value);
+				_ConnectRight(node, newNode);
+				_ConnectLeft(newNode, next, 0);
+				return;
+			}
+			level--;
+			continue;
+		} else if (c == 0) {
+			_SetNodeValue(next, value);
+			return;
+		}
+
+		node = next;
+	} while (level >= 0);
+	
+	_ConnectRight(node, newNode);
+
+	for (int i = 0; i < newNode->nexts.len; i++) {
+		_AL_SetNode(newNode->nexts, i, NULL);
+	}
 }
 
 Buffer
