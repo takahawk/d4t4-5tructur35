@@ -149,7 +149,7 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 	int level = node->nexts.len - 1;
 
 	do {
-		_SLM_Node next = _AL_GetNode(node->nexts, level);
+		_SLM_Node *next = _AL_GetNode(&node->nexts, level);
 		if (!next) {
 			level--;
 			continue;
@@ -172,16 +172,40 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 		node = next;
 	} while (level >= 0);
 	
+	_SLM_Node *newNode = _AllocNode(key, value);
 	_ConnectRight(node, newNode);
 
 	for (int i = 0; i < newNode->nexts.len; i++) {
-		_AL_SetNode(newNode->nexts, i, NULL);
+		_AL_SetNode(&newNode->nexts, i, NULL);
 	}
 }
 
-Buffer
+Buffer*
 SLM_Get(SkipListMap *slm, Buffer key) {
-	// TODO: impelement
+	_SLM_Node *node = slm->head;
+	int c = _Cmp(key, node->key);
+	if (c < 0)
+		return NULL;
+	if (c == 0)
+		return &node->value;
+	int level = node->nexts.len;
+outer:
+	while (node && level >= 0) {
+		_SLM_Node *next = _AL_GetNode(&node->nexts, level);
+		c = _Cmp(key, next->key);
+
+		if (c > 0) {
+			node = next;
+			goto outer;
+		}
+
+		if (c == 0)
+			return &next->value;
+	
+		level--;
+	}
+
+	return NULL;
 }
 
 void
