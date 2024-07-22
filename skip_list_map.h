@@ -21,7 +21,7 @@ SLM_Create();
 void
 SLM_Set(SkipListMap *slm, Buffer key, Buffer value);
 
-Buffer*
+Buffer
 SLM_Get(SkipListMap slm, Buffer key);
 
 void

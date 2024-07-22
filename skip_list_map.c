@@ -207,11 +207,11 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 	}
 }
 
-Buffer*
+Buffer
 SLM_Get(SkipListMap slm, Buffer key) {
 	_SLM_Node *node = _GetNode(slm, key);
 	if (node)
-		return &node->value;
+		return node->value;
 
 	return NULL;
 }
