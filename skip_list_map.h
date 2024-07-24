@@ -18,9 +18,15 @@ typedef struct {
 SkipListMap
 SLM_Create();
 
+// note: key and value buffers are returned as-is, so use copies if you need
+//       to modify their value or be ready for unexpected consequences
+void
+SLM_Iterate(SkipListMap *slm, void (*iter)(Buffer, Buffer));
+
 void
 SLM_Set(SkipListMap *slm, Buffer key, Buffer value);
 
+// returns NullBuffer on error
 Buffer
 SLM_Get(SkipListMap slm, Buffer key);
 

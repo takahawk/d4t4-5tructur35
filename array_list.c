@@ -41,6 +41,12 @@ AL_Add(ArrayList* al, void* elem) {
 }
 
 void
+AL_Iterate(ArrayList al, void (*iter)(void*)) {
+	for (int i = 0; i < al.len; i++)
+		iter(AL_Get(al, i));
+}
+
+void
 AL_Set(ArrayList* al, int i, void* data) {
 	if (al->len <= i)
 		// TODO: error handling?
@@ -50,11 +56,11 @@ AL_Set(ArrayList* al, int i, void* data) {
 
 
 void*
-AL_Get(ArrayList* al, int i) {
-	if (i >= al->len)
+AL_Get(ArrayList al, int i) {
+	if (i >= al.len)
 		return NULL;
 
-	return (char *) al->data + i * al->elemSize;
+	return (char *) al.data + i * al.elemSize;
 
 }
 

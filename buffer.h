@@ -1,6 +1,7 @@
 #ifndef BUFFER_H_
 #define BUFFER_H_
 
+#include <stdbool.h>
 #include <stddef.h>
 
 typedef struct {
@@ -18,6 +19,16 @@ AsBuffer(void*, size_t);
 // memory can (and should be) freed using FreeBuffer 
 Buffer
 B_Copy(Buffer);
+
+inline Buffer
+NullBuffer() {
+	return AsBuffer(NULL, 0);
+}
+
+inline bool
+IsNullBuffer(Buffer buf) {
+	return buf.data == NULL && buf.len == 0;
+}
 
 void
 FreeBuffer(Buffer*);

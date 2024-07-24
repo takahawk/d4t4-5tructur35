@@ -19,8 +19,11 @@ AL_Add(ArrayList*, void*);
 void
 AL_Set(ArrayList*, int, void*);
 
+void
+AL_Iterate(ArrayList, void (*iter)(void*));
+
 void*
-AL_Get(ArrayList*, int);
+AL_Get(ArrayList, int);
 
 // returns count of removed elements
 int
