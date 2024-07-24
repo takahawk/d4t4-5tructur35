@@ -1,18 +1,16 @@
 CC=gcc
 CFLAGS=-I.
+OBJ=array_list.o buffer.o skip_list_map.o
 
 .PHONY: all clean
 
-all: array_list.o skip_list_map.o buffer.o
+all: libd4t4-5tructur35.a
 
-array_list.o: array_list.c array_list.h
+%.o: %.c 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-buffer.o: buffer.c buffer.h
-	$(CC) -c -o $@ $< $(CFLAGS)
-
-skip_list_map.o: skip_list_map.c skip_list_map.h
-	$(CC) -c -o $@ $< $(CFLAGS)
+libd4t4-5tructur35.a: $(OBJ)
+	ar rcs $@ $^
 
 clean:
 	rm -rf *.o
