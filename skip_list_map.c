@@ -33,7 +33,7 @@ _AL_SetNode(ArrayList *al, int i, _SLM_Node *node) {
 }
 
 static inline _SLM_Node*
-_AL_GetNode(ArrayList *al, int i) {
+_AL_GetNode(ArrayList al, int i) {
 	return *((_SLM_Node**) AL_Get(al, i));
 }
 
@@ -79,7 +79,7 @@ _GetNode(SkipListMap slm, Buffer key) {
 	int level = node->nexts.len;
 outer:
 	while (node && level >= 0) {
-		_SLM_Node *next = _AL_GetNode(&node->nexts, level);
+		_SLM_Node *next = _AL_GetNode(node->nexts, level);
 		c = _Cmp(key, next->key);
 
 		if (c > 0) {
@@ -108,14 +108,14 @@ _SetNodeValue(_SLM_Node *node, Buffer newValue) {
 static _SLM_Node*
 _GetRightWithLevel(_SLM_Node *node, int level) {
 	while (node && node->nexts.len <= level)
-		node = _AL_GetNode(&node->nexts, level);
+		node = _AL_GetNode(node->nexts, level);
 	return node;
 }
 
 static _SLM_Node*
 _GetLeftWithLevel(_SLM_Node *node, int level) {
 	while (node && node->prevs.len <= level)
-		node = _AL_GetNode(&node->prevs, level);
+		node = _AL_GetNode(node->prevs, level);
 
 	return node;
 }
@@ -176,7 +176,7 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 	int level = node->nexts.len - 1;
 
 	do {
-		_SLM_Node *next = _AL_GetNode(&node->nexts, level);
+		_SLM_Node *next = _AL_GetNode(node->nexts, level);
 		if (!next) {
 			level--;
 			continue;
@@ -208,8 +208,8 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 }
 
 void
-SLM_Iterate(SkipListMap *slm, void (*iter)(Buffer, Buffer)) {
-	_SLM_Node *node = slm->head;
+SLM_Iterate(SkipListMap slm, void (*iter)(Buffer, Buffer)) {
+	_SLM_Node *node = slm.head;
 	
 	while (node) {
 		iter(node->key, node->value);	
@@ -232,7 +232,7 @@ SLM_Delete(SkipListMap *slm, Buffer key) {
 		return;
 	if (node == slm->head) {
 		// case 1: deleted node is first (head)
-		slm->head = _AL_GetNode(&node->nexts, 0);
+		slm->head = _AL_GetNode(node->nexts, 0);
 
 		if (slm->head != NULL) {
 			_SLM_Node *head = slm->head;
@@ -241,7 +241,7 @@ SLM_Delete(SkipListMap *slm, Buffer key) {
 			for (int i = 0; i < head->prevs.len; i++) {
 				_AL_SetNode(&head->prevs, i, NULL);
 			}	
-			_SLM_Node *newNext = _AL_GetNode(&head->nexts, 0);
+			_SLM_Node *newNext = _AL_GetNode(head->nexts, 0);
 			if (newNext) {
 				// promote new head to highest level
 				_ConnectLeft(head, newNext, 1);
@@ -256,10 +256,10 @@ SLM_Delete(SkipListMap *slm, Buffer key) {
 		goto cleanup;
 	}
 
-	if (_AL_GetNode(&node->nexts, 0) == NULL) {
+	if (_AL_GetNode(node->nexts, 0) == NULL) {
 		// case 2: deleted node is last
 		for (int i = 0; i < node->prevs.len; i++) {
-			_SLM_Node *prev = _AL_GetNode(&node->prevs, i);
+			_SLM_Node *prev = _AL_GetNode(node->prevs, i);
 			_AL_SetNode(&prev->nexts, i, NULL);
 		}
 		goto cleanup;
@@ -267,8 +267,8 @@ SLM_Delete(SkipListMap *slm, Buffer key) {
 
 	// case 3: node is somewhere in-between first and last
 	for (int i = 0; i < node->prevs.len; i++) {
-		_SLM_Node *prev = _AL_GetNode(&node->prevs, i);
-		_SLM_Node *next = _AL_GetNode(&node->nexts, i);
+		_SLM_Node *prev = _AL_GetNode(node->prevs, i);
+		_SLM_Node *next = _AL_GetNode(node->nexts, i);
 		_AL_SetNode(&prev->nexts, i, next);
 		_AL_SetNode(&next->prevs, i, prev);
 	}
@@ -285,7 +285,7 @@ SLM_Free(SkipListMap *slm) {
 	_SLM_Node *node = slm->head;
 
 	while (node) {
-		_SLM_Node *next = _AL_GetNode(&node->nexts, 0);
+		_SLM_Node *next = _AL_GetNode(node->nexts, 0);
 		_FreeNode(node);
 		node = next;
 	}
