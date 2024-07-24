@@ -20,12 +20,12 @@ AsBuffer(void*, size_t);
 Buffer
 B_Copy(Buffer);
 
-inline Buffer
+static inline Buffer
 NullBuffer() {
 	return AsBuffer(NULL, 0);
 }
 
-inline bool
+static inline bool
 IsNullBuffer(Buffer buf) {
 	return buf.data == NULL && buf.len == 0;
 }

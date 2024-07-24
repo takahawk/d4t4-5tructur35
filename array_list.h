@@ -35,7 +35,7 @@ AL_RemoveAt(ArrayList*, int);
 void
 AL_Swap(ArrayList*, int, int);
 
-inline bool
+static inline bool
 AL_IsEmpty(ArrayList al) {
 	return al.len == 0;	
 }
