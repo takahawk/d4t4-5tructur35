@@ -16,12 +16,22 @@ typedef struct {
 } SkipListMap;
 
 SkipListMap
-SLM_Create();
+SLM_Create() {
+	return (SkipListMap) {
+		.head = NULL
+	};
+}
 
 // note: key and value buffers are returned as-is, so use copies if you need
 //       to modify their value or be ready for unexpected consequences
-void
-SLM_Iterate(SkipListMap slm, void (*iter)(Buffer, Buffer));
+static inline void
+SLM_Iterate(SkipListMap slm, void (*iter)(Buffer, Buffer)) {
+	_SLM_Node *node = slm.head;
+	
+	while (node) {
+		iter(node->key, node->value);	
+	}
+}
 
 void
 SLM_Set(SkipListMap *slm, Buffer key, Buffer value);

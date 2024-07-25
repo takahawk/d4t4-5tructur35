@@ -2,20 +2,9 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 
 #define AL_START_CAPACITY 2 
 
-static inline int
-_Cmp(Buffer a, Buffer b) {
-	// TODO: move it to buffer probably?
-	int c = memcmp(a.data, b.data, MIN(a.len, b.len));
-	if (c == 0) {
-		// possible difference in length
-		return a.len - b.len;
-	}
-	return c;
-}
 
 static inline int
 _TossCoin() {
@@ -64,14 +53,14 @@ static void
 _FreeNode(_SLM_Node *node) {
 	FreeArrayList(&node->nexts);
 	FreeArrayList(&node->prevs);
-	FreeBuffer(&node->key);
-	FreeBuffer(&node->value);
+	B_Free(&node->key);
+	B_Free(&node->value);
 }
 
 static _SLM_Node*
 _GetNode(SkipListMap slm, Buffer key) {
 	_SLM_Node *node = slm.head;
-	int c = _Cmp(key, node->key);
+	int c = B_Cmp(key, node->key);
 	if (c < 0)
 		return NULL;
 	if (c == 0)
@@ -80,7 +69,7 @@ _GetNode(SkipListMap slm, Buffer key) {
 outer:
 	while (node && level >= 0) {
 		_SLM_Node *next = _AL_GetNode(node->nexts, level);
-		c = _Cmp(key, next->key);
+		c = B_Cmp(key, next->key);
 
 		if (c > 0) {
 			node = next;
@@ -146,13 +135,6 @@ _ConnectRight(_SLM_Node *left, _SLM_Node *right) {
 	} while (right->nexts.len < level);
 }
 
-SkipListMap
-SLM_Create() {
-	return (SkipListMap) {
-		.head = NULL
-	};
-}
-
 void
 SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 	if (slm->head == NULL) {
@@ -160,7 +142,7 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 		return;
 	}
 
-	int c = _Cmp(key, slm->head->key);
+	int c = B_Cmp(key, slm->head->key);
 
 	if (c < 0) {
 		_SLM_Node *node = _AllocNode(key, value);
@@ -181,7 +163,7 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 			level--;
 			continue;
 		}
-		c = _Cmp(key, next->key);
+		c = B_Cmp(key, next->key);
 		if (c < 0) {
 			if (level == 0) {
 				_SLM_Node *newNode = _AllocNode(key, value);
@@ -207,14 +189,6 @@ SLM_Set(SkipListMap *slm, Buffer key, Buffer value) {
 	}
 }
 
-void
-SLM_Iterate(SkipListMap slm, void (*iter)(Buffer, Buffer)) {
-	_SLM_Node *node = slm.head;
-	
-	while (node) {
-		iter(node->key, node->value);	
-	}
-}
 
 Buffer
 SLM_Get(SkipListMap slm, Buffer key) {
@@ -222,7 +196,7 @@ SLM_Get(SkipListMap slm, Buffer key) {
 	if (node)
 		return node->value;
 
-	return NullBuffer();
+	return B_Null();
 }
 
 void

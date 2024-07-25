@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/param.h>
 
 typedef struct {
 	void *data;
@@ -41,6 +42,19 @@ B_Copy(Buffer buf) {
 	memcpy(newBuf.data, buf.data, buf.len);
 
 	return newBuf;
+}
+
+// compares two buffers byte-by-byte
+// >0 if first is greater, 0 if equals, -1 if second if lesser
+// length is considered if first bytes are the same: longer is greater
+static inline int
+B_Cmp(Buffer a, Buffer b) {
+	int c = memcmp(a.data, b.data, MIN(a.len, b.len));
+	if (c == 0) {
+		// possible difference in length
+		return a.len - b.len;
+	}
+	return c;
 }
 
 
