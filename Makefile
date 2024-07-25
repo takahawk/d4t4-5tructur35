@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I.
+CFLAGS=-I. $(if $(NODEBUG),,-g)
 OBJ=array_list.o buffer.o skip_list_map.o
 
 .PHONY: all clean
@@ -13,4 +13,5 @@ libd4t4-5tructur35.a: $(OBJ)
 	ar rcs $@ $^
 
 clean:
-	rm -rf *.o
+	rm -f *.o
+	rm -f *.a
