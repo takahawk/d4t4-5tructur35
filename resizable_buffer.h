@@ -4,16 +4,31 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/param.h>
 
 #include "buffer.h"
 
 #define RESIZE_FACTOR 1.5
+#define MIN_BUFFER_SIZE 10
 
 typedef struct {
 	void *data;
 	size_t len;
 	size_t capacity;
 } ResizableBuffer;
+
+// create resizable buffer with a given capacity
+static inline ResizableBuffer
+RB_Create(size_t capacity) {
+	capacity = MIN(capacity, MIN_BUFFER_SIZE);
+	ResizableBuffer rb = {
+		.data = malloc(capacity),
+		.len = 0,
+		.capacity = capacity
+	};
+
+	return rb;
+}
 
 // returns resizable buffer that manages memory from original buffer
 // original buffer is zeroed out by this function
