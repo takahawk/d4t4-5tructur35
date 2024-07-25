@@ -8,8 +8,8 @@
 #include <sys/param.h>
 
 typedef struct {
-	void *data;
 	size_t len;
+	void *data;
 } Buffer;
 
 // not copying the data, just wrap it inside buffer struct
@@ -21,15 +21,6 @@ B_As(void* data, size_t len) {
 		.data = data,
 		.len = len
 	};
-}
-
-// convenience function to easily represent c-strings as buffer
-// not bothering to calculate it's length beforehand
-// working similar to B_As so that it is just a wrapper
-static inline Buffer
-B_StringAs(char* str) {
-	size_t len = strlen(str);
-	return B_As(str, len);
 }
 
 // copies buffer

@@ -7,14 +7,20 @@
 #include <sys/param.h>
 
 #include "buffer.h"
+#include "string.h"
 
 #define RESIZE_FACTOR 1.5
 #define MIN_BUFFER_SIZE 10
 
+#define RB_Append(X) _Generic((X), \
+	Buffer: AppendBuffer, \
+	String: AppendString  \
+	)(X)
+
 typedef struct {
+	size_t capacity;
 	void *data;
 	size_t len;
-	size_t capacity;
 } ResizableBuffer;
 
 // create resizable buffer with a given capacity
@@ -35,7 +41,7 @@ RB_Create(size_t capacity) {
 // dont try to make out resizable buffer from buffer that is mapping
 // memory not from heap pls
 static inline ResizableBuffer
-RB_AsResizable(Buffer *b) {
+RB_FromBuffer(Buffer *b) {
 	ResizableBuffer rb = {
 		.data = b->data,
 		.len = b->len,
@@ -61,11 +67,11 @@ RB_ToBuffer(ResizableBuffer *rb) {
 	return b;
 }
 
-// copies data from another buffer appending data to resizable buffer
-// reallocates memory automatically if needed
+// copiest data from void pointer appending given number of bytes to the
+// end of resizable buffer
 static inline void
-RB_Append(ResizableBuffer *rb, Buffer b) {
-	size_t len = rb->len + b.len;
+RB_AppendVoid(ResizableBuffer *rb, void* v, size_t vlen) {
+	size_t len = rb->len + vlen;
 
 	if (len > rb->capacity) {
 		while (len > rb->capacity)
@@ -73,8 +79,31 @@ RB_Append(ResizableBuffer *rb, Buffer b) {
 		rb->data = realloc(rb->data, rb->capacity);
 	}
 
-	memcpy((char *) rb->data + rb->len, b.data, b.len);
+	memcpy((char *) rb->data + rb->len, v, vlen);
 	rb->len = len;
+}
+
+// copies data from another buffer appending data to resizable buffer
+// reallocates memory automatically if needed
+static inline void
+RB_AppendBuffer(ResizableBuffer *rb, Buffer b) {
+	RB_AppendVoid(rb, b.data, b.len);
+}
+
+// appends string to resizable buffer. If buffer is null-terminated that
+// null symbol will be removed to make data null-terminated after new
+// appended bytes from string
+static inline void
+RB_AppendString(ResizableBuffer *rb, String s) {
+	if (rb->len > 0 &&
+	    s.len > 0 &&
+	    ((char *) rb->data)[rb->len - 1] == '\0') {
+
+		rb->data--;
+		rb->len--;
+	}
+
+	RB_AppendVoid(rb, s.str, s.len);
 }
 
 static inline void
