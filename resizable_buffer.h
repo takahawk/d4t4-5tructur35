@@ -14,7 +14,7 @@
 
 #define RB_Append(self, X, ...) _Generic((X), \
 	Buffer: RB_AppendBuffer,   \
-	String: RB_AppendString    \
+	String: RB_AppendString,   \
 	void*: RB_AppendVoid       \
 	)(self, X, __VA_OPT__(,) __VA_ARGS__)
 
