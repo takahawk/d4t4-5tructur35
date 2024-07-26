@@ -16,14 +16,17 @@ AllocArrayList(int elemSize, int capacity);
 void
 AL_Add(ArrayList*, void*);
 
+void*
+AL_Get(ArrayList, int);
+
 void
 AL_Set(ArrayList*, int, void*);
 
-void
-AL_Iterate(ArrayList, void (*iter)(void*));
-
-void*
-AL_Get(ArrayList, int);
+static inline void
+AL_Iterate(ArrayList al, void (*iter)(void*, ...)) {
+	for (int i = 0; i < al.len; i++)
+		iter(AL_Get(al, i));
+}
 
 // returns count of removed elements
 int

@@ -41,12 +41,6 @@ AL_Add(ArrayList* al, void* elem) {
 }
 
 void
-AL_Iterate(ArrayList al, void (*iter)(void*)) {
-	for (int i = 0; i < al.len; i++)
-		iter(AL_Get(al, i));
-}
-
-void
 AL_Set(ArrayList* al, int i, void* data) {
 	if (al->len <= i)
 		// TODO: error handling?
