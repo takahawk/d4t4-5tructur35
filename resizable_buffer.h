@@ -16,7 +16,7 @@
 	Buffer: RB_AppendBuffer,   \
 	String: RB_AppendString,   \
 	void*: RB_AppendVoid       \
-	)(self, X, __VA_OPT__(,) __VA_ARGS__)
+	)(self, X __VA_OPT__(,) __VA_ARGS__)
 
 typedef struct {
 	size_t capacity;
