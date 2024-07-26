@@ -9,7 +9,7 @@
 #define S_From(X, ...) _Generic((X), \
 	Buffer: S_FromBuffer,   \
 	Buffer*: S_FromBufferP, \
-	char*, S_FromCStr,      \
+	char*: S_FromCStr,      \
 	) (X __VA_OPT__(,) __VA_ARGS__)
 
 
