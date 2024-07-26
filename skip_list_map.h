@@ -25,11 +25,11 @@ SLM_Create() {
 // note: key and value buffers are returned as-is, so use copies if you need
 //       to modify their value or be ready for unexpected consequences
 static inline void
-SLM_Iterate(SkipListMap slm, void (*iter)(Buffer, Buffer, ...)) {
+SLM_Iterate(SkipListMap slm, void (*iter)(Buffer, Buffer, void*), void *arg) {
 	_SLM_Node *node = slm.head;
 	
 	while (node) {
-		iter(node->key, node->value);	
+		iter(node->key, node->value, arg);
 	}
 }
 

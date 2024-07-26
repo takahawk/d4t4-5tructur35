@@ -6,15 +6,6 @@
 inline static void
 _Clear(ArrayList*);
 
-static void
-memswp(void *a, void *b, int n) {
-	for (int i = 0; i < n; i++) {
-		char t = *((char *) a + i);
-		*((char *) a + i) = *((char *) b + i);
-		*((char *) b + i) = t;
-	}
-}
-
 ArrayList
 AllocArrayList(int elemSize, int capacity) {
 	ArrayList al;
@@ -37,26 +28,8 @@ AL_Add(ArrayList* al, void* elem) {
 	memcpy((char*) al->data + (al->len++ * al->elemSize), 
 	       elem,
 	       al->elemSize);
-
 }
 
-void
-AL_Set(ArrayList* al, int i, void* data) {
-	if (al->len <= i)
-		// TODO: error handling?
-		return;
-	memcpy((char *) al->data + (al->elemSize * i), data, al->elemSize);
-}
-
-
-void*
-AL_Get(ArrayList al, int i) {
-	if (i >= al.len)
-		return NULL;
-
-	return (char *) al.data + i * al.elemSize;
-
-}
 
 int
 AL_Remove(ArrayList* al, void* elem) {
@@ -86,13 +59,6 @@ AL_RemoveAt(ArrayList* al, int i) {
 	memset((char *) al->data + al->len * al->elemSize, 
 	       0,
 	       al->elemSize);
-}
-
-void
-AL_Swap(ArrayList* al, int i, int j) {
-	memswp((char *) al->data + (i * al->elemSize),
-	       (char *) al->data + (j * al->elemSize),
-       	       al->elemSize);	       
 }
 
 void

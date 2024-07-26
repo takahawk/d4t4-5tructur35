@@ -2,6 +2,7 @@
 #define ARRAY_LIST_H_
 
 #include <stdbool.h>
+#include <string.h>
 
 typedef struct {
 	int elemSize;
@@ -16,16 +17,38 @@ AllocArrayList(int elemSize, int capacity);
 void
 AL_Add(ArrayList*, void*);
 
-void*
-AL_Get(ArrayList, int);
+// bounds should be checked elsewhere
+static inline void*
+AL_Get(ArrayList al, int i) {
+	return (char *) al.data + i * al.elemSize;
+}
 
-void
-AL_Set(ArrayList*, int, void*);
+// bounds should be checked elsewhere
+static inline void
+AL_Set(ArrayList* al, int i, void* data) {
+	memcpy((char *) al->data + (al->elemSize * i), data, al->elemSize);
+}
 
 static inline void
-AL_Iterate(ArrayList al, void (*iter)(void*, ...)) {
+AL_Swap(ArrayList* al, int i, int j) {
+	char *a = (char *) al->data + (i * al->elemSize);
+	char *b = (char *) al->data + (j * al->elemSize);
+	int n = 0;
+	for (int i = 0; i < n; i++) {
+		char t = *((char *) a + i);
+		*((char *) a + i) = *((char *) b + i);
+		*((char *) b + i) = t;
+	}
+}
+
+
+// iterate through array list using callback (index, value, cb arg)
+static inline void
+AL_Iterate(ArrayList al, 
+	   void (*iter)(size_t, void*, void*), 
+	   void* arg) {
 	for (int i = 0; i < al.len; i++)
-		iter(AL_Get(al, i));
+		iter(i, AL_Get(al, i), arg);
 }
 
 // returns count of removed elements
