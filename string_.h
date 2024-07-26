@@ -1,14 +1,21 @@
 #ifndef STRING_H_
 #define STRING_H_
 
+#include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "buffer.h"
 
+#define CONV_BUFFER_SIZE 20
 #define S_From(X, ...) _Generic((X), \
 	Buffer: S_FromBuffer,   \
-	Buffer*: S_FromBufferP  \
+	Buffer*: S_FromBufferP, \
+	int: S_FromInt,         \
+	bool: S_FromBool,       \
+	float: S_FromFloat,     \
+	char*: S_Wrap           \
 	) (X __VA_OPT__(,) __VA_ARGS__)
 
 
@@ -18,6 +25,45 @@ typedef struct {
 	size_t len;
 	char* str;
 } String;
+
+static inline String
+S_Copy(char *cstr);
+
+static inline String
+S_CopyN(char *cstr, size_t len);
+
+static inline void
+S_Free(String *s);
+
+static inline String
+S_FromBool(bool b);
+
+static inline String
+S_FromBuffer(Buffer buf);
+
+static inline String
+S_FromBufferP(Buffer *buf);
+
+static inline String
+S_FromFloat(float f);
+
+static inline String
+S_FromInt(int i);
+
+static inline bool
+S_IsNull(String s);
+
+static inline String
+S_Null();
+
+static inline void
+S_Nullify(String *s);
+
+static inline Buffer
+S_ToBuffer(String *s);
+
+static inline String
+S_Wrap(char* str);
 
 // basically just wraps C string. memory is presumed to be handled elsewhere
 // without triggering S_Free. It is assumed that given string is already null
@@ -49,6 +95,19 @@ S_Nullify(String *s) {
 	s->len = 0;
 }
 
+// create string copying given number of chars from c string
+static inline String
+S_CopyN(char *cstr, size_t len) {
+	return S_From(B_From(cstr, len));
+}
+
+// copies the whole string up to null terminator (including it)
+static inline String
+S_Copy(char *cstr) {
+	size_t len = strlen(cstr);
+	return S_CopyN(cstr, len);
+}
+
 // transforms buffer to string enforcing null termination by adding \0 (only 
 // if needed).  it is assumed that it is
 // buffer that was allocated on heap
@@ -71,16 +130,28 @@ S_FromBuffer(Buffer buf) {
 static inline String
 S_FromBufferP(Buffer *buf) {
 	String s = S_FromBuffer(*buf);
-	buf->data = NULL;
-	buf->len = 0;
+	B_Nullify(buf);
 
 	return s;
 }
 
-// create string copying given number of chars from c string
 static inline String
-S_Copy(char *cstr, size_t len) {
-	return S_From(B_Wrap(cstr, len));
+S_FromInt(int i) {
+	char convBuf[CONV_BUFFER_SIZE];
+	sprintf(convBuf, "%d", i);
+	return S_Copy(convBuf);
+}
+
+static inline String
+S_FromFloat(float f) {
+	char convBuf[CONV_BUFFER_SIZE];
+	sprintf(convBuf, "%f", f);
+	return S_Copy(convBuf);
+}
+
+static inline String
+S_FromBool(bool b) {
+	return S_Copy(b ? "true" : "false");
 }
 
 // transforms string to byte. Null-terminator will be preserved.

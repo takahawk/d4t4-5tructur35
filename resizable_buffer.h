@@ -15,6 +15,7 @@
 #define RB_Append(self, X, ...) _Generic((X), \
 	Buffer: RB_AppendBuffer,   \
 	String: RB_AppendString,   \
+	char*: RB_AppendCstr,      \
 	void*: RB_AppendVoid       \
 	)(self, X __VA_OPT__(,) __VA_ARGS__)
 
@@ -68,6 +69,7 @@ RB_ToBuffer(ResizableBuffer *rb) {
 	return b;
 }
 
+
 // copiest data from void pointer appending given number of bytes to the
 // end of resizable buffer
 static inline void
@@ -105,6 +107,13 @@ RB_AppendString(ResizableBuffer *rb, String s) {
 	}
 
 	RB_AppendVoid(rb, s.str, s.len);
+}
+
+// appends c string to resizable buffer. treats it in a similar way as
+// RB_AppendString. c string is assumed to be null terminated
+static inline void
+RB_AppendCstr(ResizableBuffer *rb, char* cstr) {
+	RB_AppendString(rb, S_Wrap(cstr));
 }
 
 static inline void
