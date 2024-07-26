@@ -8,8 +8,7 @@
 
 #define S_From(X, ...) _Generic((X), \
 	Buffer: S_FromBuffer,   \
-	Buffer*: S_FromBufferP, \
-	char*: S_FromCStr       \
+	Buffer*: S_FromBufferP  \
 	) (X __VA_OPT__(,) __VA_ARGS__)
 
 
@@ -80,7 +79,8 @@ S_FromBufferP(Buffer *buf) {
 
 // create string copying given number of chars from c string
 static inline String
-S_FromCStr(char *cstr, size_t len) {
+S_Copy(char *cstr, size_t len) {
+	return S_From(B_Wrap(cstr, len));
 }
 
 // transforms string to byte. Null-terminator will be preserved.
