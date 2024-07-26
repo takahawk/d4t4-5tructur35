@@ -12,10 +12,11 @@
 #define RESIZE_FACTOR 1.5
 #define MIN_BUFFER_SIZE 10
 
-#define RB_Append(self, X) _Generic((X), \
-	Buffer: AppendBuffer, \
-	String: AppendString  \
-	)(self, X)
+#define RB_Append(self, X, ...) _Generic((X), \
+	Buffer: RB_AppendBuffer,   \
+	String: RB_AppendString    \
+	void*: RB_AppendVoid       \
+	)(self, X, __VA_ARGS__)
 
 typedef struct {
 	size_t capacity;
