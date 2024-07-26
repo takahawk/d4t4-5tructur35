@@ -7,7 +7,7 @@
 #include <sys/param.h>
 
 #include "buffer.h"
-#include "string.h"
+#include "string_.h"
 
 #define RESIZE_FACTOR 1.5
 #define MIN_BUFFER_SIZE 10
