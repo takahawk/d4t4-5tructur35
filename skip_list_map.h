@@ -15,7 +15,7 @@ typedef struct {
 	_SLM_Node *head;
 } SkipListMap;
 
-SkipListMap
+static inline SkipListMap
 SLM_Create() {
 	return (SkipListMap) {
 		.head = NULL
