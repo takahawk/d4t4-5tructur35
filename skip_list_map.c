@@ -254,6 +254,16 @@ cleanup:
 }
 
 void
+SLM_Iterate(SkipListMap slm, void (*iter)(Buffer, Buffer, void*), void *arg) {
+	_SLM_Node *node = slm.head;
+	
+	while (node) {
+		iter(node->key, node->value, arg);
+		node = _AL_GetNode(node->nexts, 0);
+	}
+}
+
+void
 SLM_Free(SkipListMap *slm) {
 	if (slm->head == NULL)
 		return;
