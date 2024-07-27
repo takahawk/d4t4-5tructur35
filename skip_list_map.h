@@ -30,6 +30,7 @@ SLM_Iterate(SkipListMap slm, void (*iter)(Buffer, Buffer, void*), void *arg) {
 	
 	while (node) {
 		iter(node->key, node->value, arg);
+		node = (_SLM_Node *) AL_Get(node->nexts, 0);
 	}
 }
 
