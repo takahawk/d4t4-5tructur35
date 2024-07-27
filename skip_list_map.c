@@ -114,7 +114,8 @@ _ConnectLeft(_SLM_Node *left, _SLM_Node *right, int expandLeft) {
 	int level = 0;
 	do {
 		_AL_SetNode(&left->nexts, level, right);
-		_AL_SetNode(&right->prevs, level, left);
+		if (right)
+			_AL_SetNode(&right->prevs, level, left);
 
 		level++;
 		right = _GetRightWithLevel(right, level);
@@ -127,7 +128,8 @@ static void
 _ConnectRight(_SLM_Node *left, _SLM_Node *right) {
 	int level = 0;
 	do {
-		_AL_SetNode(&left->nexts, level, right);
+		if (left)
+			_AL_SetNode(&left->nexts, level, right);
 		_AL_SetNode(&right->prevs, level, left);
 
 		level++;
