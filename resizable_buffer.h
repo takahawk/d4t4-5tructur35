@@ -101,8 +101,6 @@ RB_AppendString(ResizableBuffer *rb, String s) {
 	if (rb->len > 0 &&
 	    s.len > 0 &&
 	    ((char *) rb->data)[rb->len - 1] == '\0') {
-
-		rb->data--;
 		rb->len--;
 	}
 
