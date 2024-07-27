@@ -120,7 +120,7 @@ _ConnectLeft(_SLM_Node *left, _SLM_Node *right, int expandLeft) {
 		right = _GetRightWithLevel(right, level);
 		if (left->nexts.len == level && (right && expandLeft))
 			_Expand(left);
-	} while (left->nexts.len < level);
+	} while (left->nexts.len > level);
 }
 
 static void
@@ -132,7 +132,7 @@ _ConnectRight(_SLM_Node *left, _SLM_Node *right) {
 
 		level++;
 		left = _GetLeftWithLevel(left, level);
-	} while (right->nexts.len < level);
+	} while (right->nexts.len > level);
 }
 
 void
