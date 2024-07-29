@@ -1,6 +1,7 @@
 #ifndef STRING_H_
 #define STRING_H_
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -65,6 +66,22 @@ S_ToBuffer(String *s);
 static inline String
 S_Wrap(char* str);
 
+String
+S_Format(char *fmt, ...);
+
+// copies the whole string up to null terminator (including it)
+static inline String
+S_Copy(char *cstr) {
+	size_t len = strlen(cstr);
+	return S_CopyN(cstr, len);
+}
+
+// create string copying given number of chars from c string
+static inline String
+S_CopyN(char *cstr, size_t len) {
+	return S_From(B_From(cstr, len));
+}
+
 // basically just wraps C string. memory is presumed to be handled elsewhere
 // without triggering S_Free. It is assumed that given string is already null
 // terminated. In other case use S_From()
@@ -93,19 +110,6 @@ static inline void
 S_Nullify(String *s) {
 	s->str = NULL;
 	s->len = 0;
-}
-
-// create string copying given number of chars from c string
-static inline String
-S_CopyN(char *cstr, size_t len) {
-	return S_From(B_From(cstr, len));
-}
-
-// copies the whole string up to null terminator (including it)
-static inline String
-S_Copy(char *cstr) {
-	size_t len = strlen(cstr);
-	return S_CopyN(cstr, len);
 }
 
 // transforms buffer to string enforcing null termination by adding \0 (only 

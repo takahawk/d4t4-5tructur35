@@ -1,6 +1,6 @@
 CC ?= gcc
 CFLAGS=-I. $(if $(NODEBUG),,-g)
-SRC=array_list.c skip_list_map.c
+SRC=array_list.c string_.c skip_list_map.c
 OBJ=$(SRC:.c=.o)
 HEADERS=array_list.h buffer.h resizable_buffer.h skip_list_map.h string_.h
 
@@ -11,15 +11,14 @@ INSTALL_SRC_DIR ?= /usr/local/src/w/d4t4-5tructur35
 INSTALL_LIB_DIR ?= /usr/local/lib/
 
 .DEFAULT_GOAL := $(DYNAMIC_LIBRARY)
-.PHONY: check clean install
+.PHONY: check clean install 
 
 $(DYNAMIC_LIBRARY): $(OBJ)
 	$(CC) -shared -o $@ $^
 
 
 check: 
-	$(CC) -c $(SRC)
-	$(CC) -fsyntax-only $(HEADER_ONLY)
+	$(CC) -fsyntax-only $(SRC) $(HEADERS)
 
 %.o: %.c 
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -38,7 +37,6 @@ install:
 	
 	cp $(DYNAMIC_LIBRARY) $(INSTALL_LIB_DIR)
 	
-
 
 clean:
 	rm -f *.o
