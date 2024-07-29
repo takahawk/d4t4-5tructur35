@@ -27,11 +27,17 @@ typedef struct {
 	char* str;
 } String;
 
+static inline int
+S_Cmp(String a, String b);
+
 static inline String
 S_Copy(char *cstr);
 
 static inline String
 S_CopyN(char *cstr, size_t len);
+
+static inline bool
+S_Equals(String a, String b);
 
 static inline void
 S_Free(String *s);
@@ -69,6 +75,18 @@ S_Wrap(char* str);
 String
 S_Format(char *fmt, ...);
 
+static inline int
+S_Cmp(String a, String b) {
+	return B_Cmp((Buffer) {
+			.len = a.len,
+			.data = a.str,
+			},
+		     (Buffer) {
+		     	.len = b.len,
+			.data = b.str,
+		     });
+}
+
 // copies the whole string up to null terminator (including it)
 static inline String
 S_Copy(char *cstr) {
@@ -80,6 +98,11 @@ S_Copy(char *cstr) {
 static inline String
 S_CopyN(char *cstr, size_t len) {
 	return S_From(B_From(cstr, len));
+}
+
+static inline bool
+S_Equals(String a, String b) {
+	return S_Cmp(a, b) == 0;
 }
 
 // basically just wraps C string. memory is presumed to be handled elsewhere
