@@ -11,6 +11,7 @@ S_Format(char *fmt, ...) {
 
 	s.len = vsnprintf(NULL, 0, fmt, args);
 
+	va_end(args);
 	if (s.len == 0) {
 		return S_Null();
 	}
@@ -18,8 +19,8 @@ S_Format(char *fmt, ...) {
 	// null terminator
 	s.len++;
 
-
 	s.str = malloc(s.len);
+	va_start(args, fmt);
 	vsprintf(s.str, fmt, args);
 
 	va_end(args);
