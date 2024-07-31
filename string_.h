@@ -22,7 +22,7 @@
 
 // in essense a variant of buffer. functions from this unit are supposed
 // to ensure null-termination and that it is preserved 
-typedef struct {
+typedef struct String {
 	size_t len;
 	char* str;
 } String;
@@ -111,7 +111,8 @@ S_Equals(String a, String b) {
 static inline String
 S_Wrap(char* str) {
 	return (String) {
-		.len = strlen(str),
+		// with null terminator
+		.len = strlen(str) + 1,
 		.str = str
 	};
 }
@@ -136,8 +137,7 @@ S_Nullify(String *s) {
 }
 
 // transforms buffer to string enforcing null termination by adding \0 (only 
-// if needed).  it is assumed that it is
-// buffer that was allocated on heap
+// if needed). it is assumed that it is buffer that was allocated on heap
 static inline String
 S_FromBuffer(Buffer buf) {
 	String s = {
@@ -147,8 +147,7 @@ S_FromBuffer(Buffer buf) {
 	if (s.str[buf.len - 1] != '\0') {
 		s.str = realloc(s.str, ++s.len);
 		s.str[s.len - 1] = '\0';
-	}
-
+	} 
 
 	return s;
 }

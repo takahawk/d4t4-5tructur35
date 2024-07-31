@@ -32,7 +32,5 @@ int main() {
 
 	tTC_AddTest(&tc, TestEquality);
 	tTC_AddTest(&tc, TestFormat);
-	tTC_Engage(&tc);
-
-	tTC_Free(&tc);
+	return tTC_Engage(&tc);
 }
