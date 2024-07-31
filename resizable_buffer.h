@@ -92,7 +92,7 @@ RB_AppendVoid(ResizableBuffer *rb, void* v, size_t vlen) {
 			len--;
 		}
 
-	memcpy((char *) rb->data + rb->len, v, vlen);
+	memcpy(p, v, vlen);
 	rb->len = len;
 }
 
