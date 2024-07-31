@@ -32,7 +32,7 @@ typedef struct {
 // create resizable buffer with a given capacity
 static inline ResizableBuffer
 RB_Create(size_t capacity) {
-	capacity = MIN(capacity, MIN_BUFFER_SIZE);
+	capacity = MAX(capacity, MIN_BUFFER_SIZE);
 	ResizableBuffer rb = {
 		.data = malloc(capacity),
 		.len = 0,
