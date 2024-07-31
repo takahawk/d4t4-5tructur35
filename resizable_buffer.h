@@ -12,6 +12,10 @@
 #define RESIZE_FACTOR 1.5
 #define MIN_BUFFER_SIZE 10
 
+// appends given chunk to resizable buffer. removed null terminator
+// if it is present at the end of the buffer before append
+// note: if zero bytes need to be preserved just design different function
+// (something like RB_AppendW0
 #define RB_Append(self, X, ...) _Generic((X), \
 	Buffer: RB_AppendBuffer,   \
 	String: RB_AppendString,   \
@@ -80,6 +84,11 @@ RB_AppendVoid(ResizableBuffer *rb, void* v, size_t vlen) {
 		while (len > rb->capacity)
 			rb->capacity *= RESIZE_FACTOR;
 		rb->data = realloc(rb->data, rb->capacity);
+	}
+	char *p = (char *) rb->data + rb->len;
+	while (*p == '\0') {
+		p--;
+		len--;
 	}
 
 	memcpy((char *) rb->data + rb->len, v, vlen);
