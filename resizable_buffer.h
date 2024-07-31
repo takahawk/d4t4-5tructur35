@@ -86,10 +86,11 @@ RB_AppendVoid(ResizableBuffer *rb, void* v, size_t vlen) {
 		rb->data = realloc(rb->data, rb->capacity);
 	}
 	char *p = (char *) rb->data + rb->len;
-	while (*p == '\0') {
-		p--;
-		len--;
-	}
+	if (rb->len != 0)
+		while (*p == '\0') {
+			p--;
+			len--;
+		}
 
 	memcpy((char *) rb->data + rb->len, v, vlen);
 	rb->len = len;
