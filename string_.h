@@ -19,6 +19,11 @@
 	char*: S_Wrap           \
 	) (X __VA_OPT__(,) __VA_ARGS__)
 
+#define S_Copy(X, ...) _Generic(X, \
+	String: _S_CopyString, \
+	char*: _S_CopyCharP    \
+	) (X)
+
 
 // in essense a variant of buffer. functions from this unit are supposed
 // to ensure null-termination and that it is preserved 
@@ -31,7 +36,10 @@ static inline int
 S_Cmp(String a, String b);
 
 static inline String
-S_Copy(char *cstr);
+_S_CopyCharP(char*);
+
+static inline String
+_S_CopyString(String);
 
 static inline String
 S_CopyN(char *cstr, size_t len);
@@ -89,9 +97,14 @@ S_Cmp(String a, String b) {
 
 // copies the whole string up to null terminator (including it)
 static inline String
-S_Copy(char *cstr) {
+_S_CopyCharP(char *cstr) {
 	size_t len = strlen(cstr);
 	return S_CopyN(cstr, len);
+}
+
+static inline String
+_S_CopyString(String s) {
+	return S_CopyN(s.str, s.len);
 }
 
 // create string copying given number of chars from c string
