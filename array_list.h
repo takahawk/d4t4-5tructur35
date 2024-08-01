@@ -12,7 +12,7 @@ typedef struct {
 } ArrayList;
 
 ArrayList
-AllocArrayList(int elemSize, int capacity);
+AL_Alloc(int elemSize, int capacity);
 
 void
 AL_Add(ArrayList*, void*);
@@ -67,6 +67,6 @@ AL_IsEmpty(ArrayList al) {
 }
 
 void
-FreeArrayList(ArrayList*);
+AL_Free(ArrayList*);
 
 #endif

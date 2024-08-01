@@ -11,7 +11,7 @@ inline static void
 _Clear(ArrayList*);
 
 ArrayList
-AllocArrayList(int elemSize, int capacity) {
+AL_Alloc(int elemSize, int capacity) {
 	ArrayList al;
 	al.elemSize = elemSize;
 	al.capacity = u_max(MINIMUM_CAPACITY, capacity);
@@ -66,7 +66,7 @@ AL_RemoveAt(ArrayList* al, int i) {
 }
 
 void
-FreeArrayList(ArrayList* al) {
+AL_Free(ArrayList* al) {
 	free(al->data);
 	al->data = NULL;
 	al->capacity = 0;

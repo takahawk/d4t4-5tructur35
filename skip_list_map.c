@@ -37,8 +37,8 @@ _Expand(_SLM_Node *node) {
 static _SLM_Node*
 _AllocNode(Buffer key, Buffer value) {
 	_SLM_Node *node = malloc(sizeof(_SLM_Node));
-	node->nexts = AllocArrayList(sizeof(_SLM_Node*), AL_START_CAPACITY);
-	node->prevs = AllocArrayList(sizeof(_SLM_Node*), AL_START_CAPACITY);
+	node->nexts = AL_Alloc(sizeof(_SLM_Node*), AL_START_CAPACITY);
+	node->prevs = AL_Alloc(sizeof(_SLM_Node*), AL_START_CAPACITY);
 	node->key = B_Copy(key);
 	node->value = B_Copy(value);
 
@@ -51,8 +51,8 @@ _AllocNode(Buffer key, Buffer value) {
 
 static void
 _FreeNode(_SLM_Node *node) {
-	FreeArrayList(&node->nexts);
-	FreeArrayList(&node->prevs);
+	AL_Free(&node->nexts);
+	AL_Free(&node->prevs);
 	B_Free(&node->key);
 	B_Free(&node->value);
 }
