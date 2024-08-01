@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "w/ut1l5/math.h"
+
+#define MINIMUM_CAPACITY 2
+
 inline static void
 _Clear(ArrayList*);
 
@@ -10,7 +14,7 @@ ArrayList
 AllocArrayList(int elemSize, int capacity) {
 	ArrayList al;
 	al.elemSize = elemSize;
-	al.capacity = capacity;
+	al.capacity = u_max(MINIMUM_CAPACITY, capacity);
 	al.len = 0;
        	al.data = malloc(elemSize * capacity);
 	memset(al.data, 0, elemSize * capacity);
