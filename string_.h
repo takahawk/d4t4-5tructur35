@@ -32,6 +32,9 @@ typedef struct String {
 	char* str;
 } String;
 
+static inline Buffer
+S_AsBuffer(String s);
+
 static inline int
 S_Cmp(String a, String b);
 
@@ -82,6 +85,14 @@ S_Wrap(char* str);
 
 String
 S_Format(char *fmt, ...);
+
+static inline Buffer
+S_AsBuffer(String s) {
+	return (Buffer) {
+		.data = s.str,
+		.len = s.len
+	};
+}
 
 static inline int
 S_Cmp(String a, String b) {
